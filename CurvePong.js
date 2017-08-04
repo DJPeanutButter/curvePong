@@ -164,6 +164,7 @@ var hWindow         = 400,
       /* The actual canvas we're going to draw on */
       canvas:         document.createElement ("canvas"),
       start:          function (){
+        this.resize ();
         /* Start with no keys pressed (assumption) */
         keyLeft   =
         keyRight  =
@@ -278,6 +279,39 @@ var hWindow         = 400,
                                   (fServe && fContact)) ? "#37c837" : "#c83737");
                                   
         this.context.fillRect (wWindow / 2 - wPaddle / 2, hWindow - 5, wPaddle, 5);
+      },
+      resize: function (){
+        /* Check for IE because some people make poor decisions. */
+        var container = window,
+            prefix    = 'inner',
+            style = document.body.currentStyle || window.getComputedStyle (document.body);
+            
+        if (!('innerWidth' in window)){
+          prefix    = 'client';
+          container = document.documentElement || document.body;
+        }
+        
+        this.canvas.width   =
+        wWindow             = container[prefix + 'Width'] -
+                              parseInt (style.marginLeft) -
+                              parseInt (style.marginRight);
+        
+        this.canvas.height  =
+        hWindow             = wWindow / 3.25;
+        rBall               = wWindow / (1300 / 2.5);
+        wPaddle             = wWindow / (1300 / 120);
+        hPaddle             = wWindow / (1300 / 1);
+        xBallStart          = wWindow / (1300 / 25);
+        yBallStart          = wWindow / (1300 / 25);
+        xPaddleStart        = wWindow / (1300 / (wPaddle / 2));
+        dXStart             = wWindow / (1300 / 5);
+        dYStart             = wWindow / (1300 / 2.5);
+        ddXStart            = wWindow / (1300 / 0);
+        ddY                 = wWindow / (1300 / 0.25);
+        dPaddleStart        = wWindow / (1300 / 0);
+        dMaxPaddle          = wWindow / (1300 / 20);
+        yPaddle             = wWindow / (1300 / 343.75);
+    
       }
     };
     
@@ -376,7 +410,7 @@ function gameLoop (){
      */
     if ((dPaddle !== 0) && yBall > rBall){
       ddX = -dPaddle / 30;
-      dX += dPaddle;
+      dX += wWindow / (1300 / dPaddle);
       
       /* Can't hit the paddle twice on a serve */
       if (fContact && fServe)
@@ -401,10 +435,10 @@ function gameLoop (){
    * isn't yet at max speed, increase speed
    */
   if (keyLeft && dPaddle > -dMaxPaddle)
-    dPaddle--;
+    dPaddle -= wWindow / 1300;
   
   if (keyRight && dPaddle < dMaxPaddle)
-    dPaddle++;
+    dPaddle += wWindow / 1300;
   
   /*
    * Paddle Speed Decay
